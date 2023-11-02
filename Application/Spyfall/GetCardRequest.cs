@@ -15,6 +15,7 @@ public record GetCardRequest
     /// <summary>
     /// A 1-based player number.
     /// </summary>
+    /// <example>1</example>
     public byte Number { get; init; } = 1;
 }
 

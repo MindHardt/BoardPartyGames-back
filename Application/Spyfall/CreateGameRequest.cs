@@ -11,19 +11,20 @@ public record CreateGameRequest
     /// <summary>
     /// A total amount of players in game.
     /// </summary>
-    [DefaultValue(5)]
-    public byte PlayersCount { get; init; } = 5;
+    /// <example>5</example>
+    public byte PlayersCount { get; init; }
 
     /// <summary>
     /// The amount of spies in game. If emitted, will be calculated based on <see cref="PlayersCount"/>.
     /// </summary>
+    /// <example>null</example>
     [DefaultValue(null)]
     public byte? SpiesCount { get; init; } = null;
 
     /// <summary>
     /// A random seed used to recreate games. If emitted, will be randomized.
     /// </summary>
-    [DefaultValue((object?)null)]
+    /// <example>null</example>
     public int? RandomSeed { get; init; }
 }
 
