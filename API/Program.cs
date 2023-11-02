@@ -10,7 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.IncludeXmlComments($"{builder.Environment.ContentRootPath}/API.xml");
-    options.IncludeXmlComments($"{builder.Environment.ContentRootPath}/../Application/Application.xml");
+    options.IncludeXmlComments($"{builder.Environment.ContentRootPath}/Application.xml");
 });
 
 builder.Services.AddRequestHandlers();
