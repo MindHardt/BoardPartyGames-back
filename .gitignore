@@ -6,6 +6,10 @@
 # dotenv files
 .env
 
+# generated xml docs
+API.xml
+Application.xml
+
 # User-specific files
 *.rsuser
 *.suo

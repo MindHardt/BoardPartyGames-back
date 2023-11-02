@@ -8,6 +8,13 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class SpyfallController : ControllerBase
 {
+    /// <summary>
+    /// Calculates a key for a spyfall game with specified parameters.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="handler"></param>
+    /// <param name="ct"></param>
+    /// <returns>A string key of a spyfall game. It will look like ACG5-AB15-041F</returns>
     [HttpPost]
     [EndpointName("CreateGame")]
     [EndpointDescription("Creates a new spyfall game. This should be treated as a game key generator.")]
@@ -22,6 +29,13 @@ public class SpyfallController : ControllerBase
             : BadRequest(result.Exception.Message);
     }
 
+    /// <summary>
+    /// Gets a game card of a user with specified number in a game with given key.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="handler"></param>
+    /// <param name="ct"></param>
+    /// <returns>A json with location and role. If role is a "Spy" then location is set to null.</returns>
     [HttpGet("card")]
     [EndpointName("GetCard")]
     [EndpointDescription("Gets a game card.")]

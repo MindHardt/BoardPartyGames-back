@@ -64,7 +64,8 @@ public record Game
         var randomSeed = BitConverter.GetBytes(RandomSeed);
 
         var bytes = randomSeed.Append(SpiesCount).Append(PlayersCount).ToArray();
-        return Convert.ToHexString(bytes);
+        var hex = Convert.ToHexString(bytes);
+        return $"{hex[..4]}-{hex[4..8]}-{hex[8..]}";
     }
 
     /// <summary>
@@ -75,7 +76,7 @@ public record Game
     /// <returns></returns>
     public static Game FromKey(string key)
     {
-        var bytes = Convert.FromHexString(key);
+        var bytes = Convert.FromHexString(key.Replace(" ", string.Empty));
 
         var randomSeed = BitConverter.ToInt32(bytes.AsSpan()[..4]);
         var spiesCount = bytes[4];
