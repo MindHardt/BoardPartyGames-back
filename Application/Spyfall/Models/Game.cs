@@ -76,7 +76,7 @@ public record Game
     /// <returns></returns>
     public static Game FromKey(string key)
     {
-        var bytes = Convert.FromHexString(key.Replace(" ", string.Empty));
+        var bytes = Convert.FromHexString(key.Replace("-", string.Empty));
 
         var randomSeed = BitConverter.ToInt32(bytes.AsSpan()[..4]);
         var spiesCount = bytes[4];
