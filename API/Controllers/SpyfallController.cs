@@ -1,5 +1,6 @@
 ﻿using Application;
 using Application.Spyfall;
+using Application.Spyfall.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -18,14 +19,16 @@ public class SpyfallController : ControllerBase
     [HttpPost]
     [EndpointName("CreateGame")]
     [EndpointDescription("Creates a new spyfall game. This should be treated as a game key generator.")]
-    public async Task<IActionResult> CreateGame(
+    public async Task<ActionResult<SpyfallGameModel>> CreateGame(
         [FromBody] CreateGameRequest request,
         [FromServices] CreateGameHandler handler,
         CancellationToken ct)
     {
-        var result = await handler.HandleAsync(request, ct).AsResult();
+        var result = await handler
+            .HandleAsync(request, ct)
+            .AsResult();
         return result.Success
-            ? Ok(result.Value.GetKey())
+            ? result.Value
             : BadRequest(result.Exception.Message);
     }
 
@@ -39,14 +42,16 @@ public class SpyfallController : ControllerBase
     [HttpGet("card")]
     [EndpointName("GetCard")]
     [EndpointDescription("Gets a game card.")]
-    public async Task<IActionResult> GetCard(
+    public async Task<ActionResult<SpyfallPlayerCardModel>> GetCard(
         [FromQuery] GetCardRequest request,
         [FromServices] GetCardHandler handler,
         CancellationToken ct)
     {
         var result = await handler.HandleAsync(request, ct).AsResult();
         return result.Success
-            ? Ok(result.Value)
-            : BadRequest(result.Exception.Message);
+            ? result.Value
+            : result.Exception is ArgumentNullException
+                ? NotFound()
+                : BadRequest(result.Exception.Message);
     }
 }
