@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using API.Models;
 using API.services;
 using Data.Entities;
 using Microsoft.AspNetCore.Http;
@@ -51,18 +52,22 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register([FromBody] User model)
+        public IActionResult Register([FromBody] RegisterModel model)
         {
-            Debug.WriteLine("reg!!!!");
-            // Проверяем, не существует ли пользователь с таким именем
             try
             {
-                var isSuccess = _userService.Register(model);
+                User user = new User
+                {
+                    Username = model.Username,
+                    PasswordHash = model.Password
+                };
+
+                var isSuccess = _userService.Register(user);
 
                 if (isSuccess)
                 {
-                    Debug.WriteLine("OKK!!!");
-                    return Ok("Registration successful");
+                    var token = GenerateJwtToken(user);
+                    return Ok(new { Token = token });
                 }
                 else
                 {
@@ -71,8 +76,6 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("NOoooo!!!");
-                // В реальном приложении логгируйте исключение и возвращайте соответствующий HTTP-статус
                 return StatusCode(500, "Internal Server Error");
             }
         }
@@ -84,7 +87,7 @@ namespace API.Controllers
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                // Добавьте другие необходимые утверждения (claims)
+                // claims
             };
 
             var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.SecretKey));
