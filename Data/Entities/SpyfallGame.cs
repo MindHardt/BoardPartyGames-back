@@ -15,6 +15,8 @@ public record SpyfallGame : IEntityTypeConfiguration<SpyfallGame>
     public required Guid LocationId { get; set; }
     public SpyfallLocation Location { get; set; } = null!;
 
+    public ICollection<SpyfallPlayer>? Players { get; set; }
+
     public ICollection<SpyfallLocation> PossibleLocations { get; set; } = null!;
 
     public void Configure(EntityTypeBuilder<SpyfallGame> builder)
@@ -27,5 +29,8 @@ public record SpyfallGame : IEntityTypeConfiguration<SpyfallGame>
         builder.HasMany(x => x.PossibleLocations)
             .WithMany()
             .UsingEntity(x => x.ToTable("SpyfallGameLocations"));
+        builder.HasMany(x => x.Players)
+            .WithMany()
+            .UsingEntity(x => x.ToTable("SpyfallGamePlayers"));
     }
 }

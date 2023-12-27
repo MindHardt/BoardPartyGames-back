@@ -10,6 +10,13 @@ namespace API.Controllers;
 [Route("[controller]")]
 public class SpyfallController : ControllerBase
 {
+    private readonly SpyfallLocationRepository _locationRepository;
+
+    public SpyfallController(SpyfallLocationRepository locationRepository)
+    {
+        _locationRepository = locationRepository;
+    }
+
     /// <summary>
     /// Calculates a key for a spyfall game with specified parameters.
     /// </summary>
@@ -31,6 +38,25 @@ public class SpyfallController : ControllerBase
         return result.Success
             ? result.Value
             : BadRequest(result.Exception.Message);
+    }
+
+    [HttpGet("locations")]
+    [EndpointName("GetAllLocations")]
+    [EndpointDescription("Gets list of all game locations.")]
+    public async Task<IActionResult> GetLocations()
+    {
+        var locations = await _locationRepository.GetLocationsAsync();
+        return Ok(locations);
+    }
+
+
+    [HttpGet("decks")]
+    [EndpointName("GetDecks")]
+    [EndpointDescription("Gets list of decks.")]
+    public async Task<IActionResult> GetDecks()
+    {
+        var decks= await _locationRepository.GetDecksAsync();
+        return Ok(decks);
     }
 
     /// <summary>

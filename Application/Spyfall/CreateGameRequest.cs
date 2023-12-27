@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using Application.Spyfall.Models;
 using Data;
 using Data.Entities;
@@ -21,8 +22,8 @@ public record CreateGameRequest
     /// The ids of the locations that can be used for this <see cref="SpyfallGame"/>.
     /// Cannot have more than <see cref="MaxLocations"/> elements.
     /// </summary>
-    [DefaultValue(new[] { "487fbd48-ff40-42e6-b00f-a5f7410b50c2", "558d22f1-f3c5-42a6-9c7a-9080267bc3f3", "e36c20c7-58b6-4bb6-bd99-36f4c7bbb34b" })]
-    public required Guid[] LocationIds { get; init; }
+    [DefaultValue(new[] { "Стандартная", "premium gold VIP deck" })]
+    public required string[] decks { get; init; }
 
     /// <summary>
     /// A total amount of players in game.
@@ -54,7 +55,7 @@ public class CreateGameHandler(
         var spiesCount = request.SpiesCount ?? CalculateSpiesCount(request.PlayersCount);
 
         var locations = await dataContext.SpyfallLocations
-            .Where(x => request.LocationIds.Contains(x.Id))
+            .Where(x => request.decks.Contains(x.Deck))
             .Take(CreateGameRequest.MaxLocations)
             .ToArrayAsync(ct);
 

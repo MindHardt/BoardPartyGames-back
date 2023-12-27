@@ -1,6 +1,8 @@
 ﻿using Application.Spyfall.Models;
 using Data;
+using Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace Application.Spyfall;
 
@@ -17,7 +19,7 @@ public record GetCardRequest
     /// A 1-based player number.
     /// </summary>
     /// <example>1</example>
-    public byte Number { get; init; } = 1;
+    public required string Nickname { get; init; }
 }
 
 public class GetCardHandler(
@@ -33,17 +35,52 @@ public class GetCardHandler(
         ArgumentNullException.ThrowIfNull(game);
 
         var roles = game.Location.Roles
-            .Cast<string?>()
+            .Cast<string>()
             .ToList();
-        foreach (var spyIndex in game.SpiesIndices)
+
+        string randomRole = "";
+        Random random = new Random();
+
+        game.Players ??= new List<SpyfallPlayer>();
+
+        List<string> usedRoles = game.Players?.Select(x => x.Role)?.ToList() ?? new List<string>();
+        if (usedRoles.Count == 0)
         {
-            roles.Insert(spyIndex, null);
+            randomRole = roles[random.Next(roles.Count)];
+        }
+        else
+        {
+            List<string> unusedRoles = roles.Except(usedRoles).ToList();
+            randomRole = unusedRoles[random.Next(unusedRoles.Count)];
         }
 
-        var role = roles[request.Number - 1];
+        var newPlayer = new SpyfallPlayer
+        {
+            Nickname = request.Nickname,
+            Role = randomRole
+        };
 
-        return role is null
+        int spies = game.Players?.Count(x => x.Role == "spy") ?? 0;
+        if (game.SpiesCount > spies)
+        {
+            bool isSpy = random.Next(2) == 0;
+            if (isSpy || (game.SpiesCount - spies) >= game.PlayersCount - (game.Players?.Count() ?? 0))
+            {
+                newPlayer.Role = "spy";
+            }
+        }
+
+        var existingGame = dataContext.SpyfallGames.Find(request.GameId);
+        if (existingGame != null)
+        {
+            existingGame.Players ??= new List<SpyfallPlayer>();
+            existingGame.Players.Add(newPlayer);
+
+            await dataContext.SaveChangesAsync();
+        }
+
+        return newPlayer.Role is "spy"
             ? SpyfallPlayerCardModel.Spy
-            : new SpyfallPlayerCardModel(game.Location.Name, role);
+            : new SpyfallPlayerCardModel(game.Location.Name, newPlayer.Role);
     }
 }

@@ -51,6 +51,10 @@ namespace Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Deck")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("ImageUrl")
                         .IsRequired()
                         .HasColumnType("text");
@@ -75,6 +79,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("558d22f1-f3c5-42a6-9c7a-9080267bc3f3"),
+                            Deck = "Стандартная",
                             ImageUrl = "img/Spyfall/Заправка.jpg",
                             Name = "Заправка",
                             Roles = new[] { "Кассир", "Заправщик", "Дальнобойщик", "Водитель", "Уборщица", "Автомойщик", "Ребенок в кресле", "Кот" }
@@ -82,6 +87,7 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("e36c20c7-58b6-4bb6-bd99-36f4c7bbb34b"),
+                            Deck = "Стандартная",
                             ImageUrl = "img/Spyfall/Кафе.jpg",
                             Name = "Кафе",
                             Roles = new[] { "Повар", "Официант", "Бармен", "Завсегдатай", "Удаленщик", "Уборщик", "Ребенок", "Толстяк" }
@@ -89,10 +95,38 @@ namespace Data.Migrations
                         new
                         {
                             Id = new Guid("487fbd48-ff40-42e6-b00f-a5f7410b50c2"),
+                            Deck = "Стандартная",
                             ImageUrl = "img/Spyfall/Тюрьма.jpg",
                             Name = "Тюрьма",
                             Roles = new[] { "Охранник", "Повар", "Наркоторговец", "Контрабандист", "Убийца", "Врач", "Вор", "Посетитель" }
+                        },
+                        new
+                        {
+                            Id = new Guid("547fcd48-ff40-42e6-d10d-a5f7410b30f5"),
+                            Deck = "premium gold VIP deck",
+                            ImageUrl = "img/Spyfall/Поезд.jpg",
+                            Name = "Поезд",
+                            Roles = new[] { "Охранник", "Проводник", "Наркоторговец", "Контрабандист", "Убийца", "Повор", "Пассажир" }
                         });
+                });
+
+            modelBuilder.Entity("Data.Entities.SpyfallPlayer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SpyfallPlayers");
                 });
 
             modelBuilder.Entity("Data.Entities.User", b =>
@@ -129,6 +163,21 @@ namespace Data.Migrations
                     b.ToTable("SpyfallGameLocations", (string)null);
                 });
 
+            modelBuilder.Entity("SpyfallGameSpyfallPlayer", b =>
+                {
+                    b.Property<Guid>("PlayersId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SpyfallGameId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("PlayersId", "SpyfallGameId");
+
+                    b.HasIndex("SpyfallGameId");
+
+                    b.ToTable("SpyfallGamePlayers", (string)null);
+                });
+
             modelBuilder.Entity("Data.Entities.SpyfallGame", b =>
                 {
                     b.HasOne("Data.Entities.SpyfallLocation", "Location")
@@ -145,6 +194,21 @@ namespace Data.Migrations
                     b.HasOne("Data.Entities.SpyfallLocation", null)
                         .WithMany()
                         .HasForeignKey("PossibleLocationsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.SpyfallGame", null)
+                        .WithMany()
+                        .HasForeignKey("SpyfallGameId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SpyfallGameSpyfallPlayer", b =>
+                {
+                    b.HasOne("Data.Entities.SpyfallPlayer", null)
+                        .WithMany()
+                        .HasForeignKey("PlayersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

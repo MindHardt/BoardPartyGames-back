@@ -14,6 +14,7 @@ public record SpyfallLocation : IEntityTypeConfiguration<SpyfallLocation>
     public required string Name { get; set; }
     public required string ImageUrl { get; set; }
     public required string[] Roles { get; set; }
+    public required string Deck { get; set; }
 
     public void Configure(EntityTypeBuilder<SpyfallLocation> builder)
     {
@@ -33,7 +34,8 @@ public record SpyfallLocation : IEntityTypeConfiguration<SpyfallLocation>
             Roles = new[]
             {
                 "Кассир", "Заправщик", "Дальнобойщик", "Водитель", "Уборщица", "Автомойщик", "Ребенок в кресле", "Кот"
-            }
+            },
+            Deck = "Стандартная"
         },
         new()
         {
@@ -43,7 +45,8 @@ public record SpyfallLocation : IEntityTypeConfiguration<SpyfallLocation>
             Roles = new[]
             {
                 "Повар", "Официант", "Бармен", "Завсегдатай", "Удаленщик", "Уборщик", "Ребенок", "Толстяк"
-            }
+            },
+            Deck = "Стандартная"
         },
         new()
         {
@@ -53,7 +56,19 @@ public record SpyfallLocation : IEntityTypeConfiguration<SpyfallLocation>
             Roles = new[]
             {
                 "Охранник", "Повар", "Наркоторговец", "Контрабандист", "Убийца", "Врач", "Вор", "Посетитель"
-            }
+            },
+            Deck = "Стандартная"
+        },
+        new()
+        {
+            Id = Guid.Parse("547fcd48-ff40-42e6-d10d-a5f7410b30f5"),
+            Name = "Поезд",
+            ImageUrl = "img/Spyfall/Поезд.jpg",
+            Roles = new[]
+            {
+                "Охранник", "Проводник", "Наркоторговец", "Контрабандист", "Убийца", "Повор", "Пассажир"
+            },
+            Deck = "premium gold VIP deck"
         }
     };
 }
