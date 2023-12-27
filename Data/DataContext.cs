@@ -7,7 +7,10 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
 {
     public DbSet<SpyfallGame> SpyfallGames => Set<SpyfallGame>();
     public DbSet<SpyfallLocation> SpyfallLocations => Set<SpyfallLocation>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
-        => modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+    }
 }

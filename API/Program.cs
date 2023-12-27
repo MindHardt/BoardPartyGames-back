@@ -1,8 +1,12 @@
+using System.Text;
 using System.Text.Encodings.Web;
 using API;
+using API.Controllers;
+using API.services;
 using Application;
 using Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +24,30 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments($"{builder.Environment.ContentRootPath}/Application.xml");
 });
 
+builder.Services.AddScoped<UserService>();
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
+
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = "JwtBearer";
+    options.DefaultChallengeScheme = "JwtBearer";
+})
+.AddJwtBearer("JwtBearer", jwtBearerOptions =>
+{
+    var jwtOptions = builder.Configuration.GetSection("JwtOptions").Get<JwtOptions>();
+
+    jwtBearerOptions.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions.SecretKey)),
+        ValidateIssuer = jwtOptions.ValidateIssuer,
+        ValidateAudience = jwtOptions.ValidateAudience,
+        ValidateLifetime = jwtOptions.ValidateLifetime,
+        ClockSkew = jwtOptions.ClockSkew
+    };
+});
+
 builder.Services.AddRequestHandlers();
 
 builder.Services.AddControllers()
@@ -34,6 +62,7 @@ await using (var scope = app.Services.CreateAsyncScope())
     await scope.ServiceProvider.GetRequiredService<DataContext>().Database.MigrateAsync();
 }
 
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -47,6 +76,9 @@ app.UseStaticFiles();
 app.UseErrorHandling();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers()
     .WithOpenApi();
