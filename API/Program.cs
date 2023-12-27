@@ -71,6 +71,8 @@ if (app.Environment.IsDevelopment())
     app.UseCors(cors => cors.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 }
 
+app.UseCors(cors => cors.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+
 app.UseStaticFiles();
 
 app.UseErrorHandling();

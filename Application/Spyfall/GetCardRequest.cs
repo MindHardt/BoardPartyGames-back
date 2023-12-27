@@ -28,11 +28,31 @@ public class GetCardHandler(
 {
     public async Task<SpyfallPlayerCardModel> HandleAsync(GetCardRequest request, CancellationToken ct = default)
     {
+        if (request.Nickname.Length < 3)
+            throw new Exception("Nickname must be more then 2 characters");
+
         var game = await dataContext.SpyfallGames
             .Include(x => x.Location)
+            .Include(x => x.Players)
             .FirstOrDefaultAsync(x => x.Id == request.GameId, ct);
 
         ArgumentNullException.ThrowIfNull(game);
+
+        game.Players ??= new List<SpyfallPlayer>();
+
+        if (game.Players.Count >= game.PlayersCount)
+        {
+            throw new Exception("The limit of players in the room has been exceeded");
+        }
+
+        var playerExist = game.Players?.FirstOrDefault(player => player.Nickname == request.Nickname);
+        if (playerExist is not null)
+        {
+            return playerExist.Role is "spy"
+                ? SpyfallPlayerCardModel.Spy
+                : new SpyfallPlayerCardModel(game.Location.Name, playerExist.Role);
+        }
+
 
         var roles = game.Location.Roles
             .Cast<string>()
@@ -40,8 +60,6 @@ public class GetCardHandler(
 
         string randomRole = "";
         Random random = new Random();
-
-        game.Players ??= new List<SpyfallPlayer>();
 
         List<string> usedRoles = game.Players?.Select(x => x.Role)?.ToList() ?? new List<string>();
         if (usedRoles.Count == 0)

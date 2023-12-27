@@ -68,6 +68,13 @@ public class CreateGameHandler(
         }
 
         var location = locations[Random.Shared.Next(locations.Length)];
+
+        if (location.Roles.Length + request.SpiesCount < request.PlayersCount)
+        {
+            throw new ArgumentException(
+                "There are fewer roles in the location than there are players");
+        }
+
         var allIndices = Enumerable.Range(0, request.PlayersCount)
             .ToArray();
         var spiesIndices = Random.Shared.GetItems(allIndices, request.SpiesCount!.Value);

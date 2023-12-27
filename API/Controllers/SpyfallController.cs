@@ -49,6 +49,14 @@ public class SpyfallController : ControllerBase
         return Ok(locations);
     }
 
+    [HttpGet("locationsByRoomId")]
+    [EndpointDescription("Gets all locations of current room")]
+    public async Task<IActionResult> GetLocationsByRoomId(Guid id)
+    {
+        var locations = await _locationRepository.GetLocationsByRoomIdAsync(id);
+        return Ok(locations);
+    }
+
 
     [HttpGet("decks")]
     [EndpointName("GetDecks")]

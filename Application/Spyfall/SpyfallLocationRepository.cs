@@ -34,6 +34,28 @@ public class SpyfallLocationRepository
         return locationsWithoutRoles;
     }
 
+    public async Task<List<Location>> GetLocationsByRoomIdAsync(Guid id)
+    {
+        var game = await _context.SpyfallGames
+            .Include(x => x.PossibleLocations)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+        if (game != null)
+        {
+            var result = game.PossibleLocations.Select(location => new Location
+            {
+                Id = location.Id,
+                Name = location.Name,
+                ImageUrl = location.ImageUrl
+            }).ToList();
+            return result;
+        }
+        else
+        {
+            throw new Exception("invalid token");
+        }
+    }
+
     public async Task<List<string>> GetDecksAsync()
     {
         return await _context.SpyfallLocations.Select(location => location.Deck).Distinct().ToListAsync();
