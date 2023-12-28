@@ -8,6 +8,11 @@ public class DataContext(DbContextOptions<DataContext> options) : DbContext(opti
     public DbSet<SpyfallGame> SpyfallGames => Set<SpyfallGame>();
     public DbSet<SpyfallLocation> SpyfallLocations => Set<SpyfallLocation>();
     public DbSet<SpyfallPlayer> SpyfallPlayers => Set<SpyfallPlayer>();
+
+    public DbSet<CodenamesWord> CodenamesWords => Set<CodenamesWord>();
+    public DbSet<CodenamesGame> CodenamesGames => Set<CodenamesGame>();
+    public DbSet<CodenamesPlayer> CodenamesPlayers => Set<CodenamesPlayer>();
+
     public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

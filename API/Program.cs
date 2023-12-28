@@ -27,6 +27,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddScoped<UserService>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.AddScoped<SpyfallLocationRepository>();
+builder.Services.AddScoped<CodenamesWordRepository>();
 
 builder.Services.AddAuthentication(options =>
 {
