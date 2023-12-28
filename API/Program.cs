@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using API;
 using API.Controllers;
+using API.Hubs;
 using API.services;
 using Application;
 using Data;
@@ -28,6 +29,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.AddScoped<SpyfallLocationRepository>();
 builder.Services.AddScoped<CodenamesWordRepository>();
+builder.Services.AddSignalR();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -56,6 +58,18 @@ builder.Services.AddControllers()
 
 builder.Services.AddErrorHandling();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowSpecificOrigins",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:3000", "http://localhost:3001")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 
 await using (var scope = app.Services.CreateAsyncScope())
@@ -69,10 +83,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-    app.UseCors(cors => cors.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 }
 
-app.UseCors(cors => cors.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+app.UseCors("AllowSpecificOrigins");
 
 app.UseStaticFiles();
 
@@ -80,10 +93,18 @@ app.UseErrorHandling();
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers()
     .WithOpenApi();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("/chatHub");
+    endpoints.MapControllers();
+});
 
 app.Run();
